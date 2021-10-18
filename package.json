@@ -1,0 +1,9 @@
+{
+  "name": "com.littlebitgames.sceneloadermodule",
+  "displayName": "Scene Loader Module",
+  "version": "0.0.1",
+  "unity": "2021.1",
+  "unityRelease": "6f1",
+  "description": "This module provides work with scenes",
+  "category": "Module"
+}
