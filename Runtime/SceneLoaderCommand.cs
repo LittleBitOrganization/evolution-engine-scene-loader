@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace LittleBit.Modules.SceneLoader
@@ -9,8 +10,7 @@ namespace LittleBit.Modules.SceneLoader
         protected string PathScene;
 
         protected Scene SceneData;
-
-        public Scene SceneData1 => SceneData;
+        public Scene Data => SceneData;
 
         protected GameObject RootGameObject;
 
@@ -20,7 +20,9 @@ namespace LittleBit.Modules.SceneLoader
             PathScene = pathScene;
         }
 
-        public abstract void Load();
-        public abstract void Unload();
+        public abstract void Load(Action onComplete);
+        public abstract void Unload(Action onComplete);
     }
+    
+    
 }

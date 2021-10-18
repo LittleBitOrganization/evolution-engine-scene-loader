@@ -1,9 +1,12 @@
-﻿using UnityEngine.SceneManagement;
+﻿using System;
+using UnityEngine.SceneManagement;
 
 namespace LittleBit.Modules.SceneLoader
 {
     public class LoadSceneCommand : SceneLoaderCommand
     {
+        private Action _onComplete;
+        
         public LoadSceneCommand(SceneLoaderService sceneLoaderService, SceneReference sceneReference) : base(
             sceneLoaderService, sceneReference.ScenePath)
         {
@@ -16,19 +19,17 @@ namespace LittleBit.Modules.SceneLoader
             SceneData = SceneManager.GetSceneByPath(PathScene);
         }
 
-        public override void Load()
+        public override void Load(Action onComplete)
         {
-            SceneLoaderService.LoadSceneAsync(PathScene, null, OnUnload);
+            SceneLoaderService.LoadSceneAsync(PathScene, null, onComplete);
         }
 
-        public override void Unload()
+        public override void Unload(Action onComplete)
         {
-            SceneLoaderService.UnloadScene(PathScene, null, null);
-        }
-
-        private void OnUnload()
-        {
+            SceneLoaderService.UnloadScene(PathScene, null, onComplete);
 
         }
+
     }
+    
 }
