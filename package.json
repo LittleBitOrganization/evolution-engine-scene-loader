@@ -1,12 +1,22 @@
 {
   "name": "com.littlebitgames.sceneloadermodule",
   "displayName": "Scene Loader Module",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "unity": "2021.1",
   "unityRelease": "6f1",
   "description": "This module provides work with scenes",
   "category": "Module",
   "dependencies": {
-    "com.johannesmp.unityscenereference": ""
-  }
+    "com.johannesmp.unityscenereference": "1.1.1"
+  },
+
+  "scopedRegistries": [
+    {
+      "name": "package.openupm.com",
+      "url": "https://package.openupm.com",
+      "scopes": [
+        "com.johannesmp.unityscenereference"
+      ]
+    }
+  ]
 }
