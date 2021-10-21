@@ -5,5 +5,8 @@
   "unity": "2021.1",
   "unityRelease": "6f1",
   "description": "This module provides work with scenes",
-  "category": "Module"
+  "category": "Module",
+  "author": {
+    "name": "LittleBitGames"
+  }
 }
