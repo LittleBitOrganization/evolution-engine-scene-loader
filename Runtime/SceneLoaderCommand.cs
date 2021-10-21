@@ -20,7 +20,7 @@ namespace LittleBit.Modules.SceneLoader
             PathScene = pathScene;
         }
 
-        public abstract void Load(Action onComplete);
+        public abstract void Load();
         public abstract void Unload(Action onComplete);
     }
     

@@ -5,8 +5,9 @@ namespace LittleBit.Modules.SceneLoader
 {
     public class LoadSceneCommand : SceneLoaderCommand
     {
-        private Action _onComplete;
-        
+        public event Action OnComplete;
+        public event Action<float> OnUpdateProgress;
+
         public LoadSceneCommand(SceneLoaderService sceneLoaderService, SceneReference sceneReference) : base(
             sceneLoaderService, sceneReference.ScenePath)
         {
@@ -19,9 +20,12 @@ namespace LittleBit.Modules.SceneLoader
             SceneData = SceneManager.GetSceneByPath(PathScene);
         }
 
-        public override void Load(Action onComplete)
+        public override void Load()
         {
-            SceneLoaderService.LoadSceneAsync(PathScene, null, onComplete);
+            SceneLoaderService.LoadSceneAsync(PathScene, OnUpdateProgressLoad, OnCompleteLoad);
+            
+            void OnCompleteLoad() => OnComplete?.Invoke();
+            void OnUpdateProgressLoad(float value) => OnUpdateProgress?.Invoke(value);
         }
 
         public override void Unload(Action onComplete)
