@@ -1,5 +1,5 @@
 ﻿using System;
-using UnityEngine.SceneManagement;
+using Zenject;
 
 namespace LittleBit.Modules.SceneLoader
 {
@@ -8,21 +8,15 @@ namespace LittleBit.Modules.SceneLoader
         public event Action OnComplete;
         public event Action<float> OnUpdateProgress;
 
-        public LoadSceneCommand(SceneLoaderService sceneLoaderService, SceneReference sceneReference) : base(
-            sceneLoaderService, sceneReference.ScenePath)
-        {
-            SceneData = SceneManager.GetSceneByPath(PathScene);
-        }
+        public LoadSceneCommand(ISceneLoaderService sceneLoaderService, SceneReference sceneReference, LoadSceneRelationship loadSceneRelationship = LoadSceneRelationship.None) : base(
+            sceneLoaderService, sceneReference.ScenePath, loadSceneRelationship) { }
         
-        public LoadSceneCommand(SceneLoaderService sceneLoaderService, string pathScene) : base(
-            sceneLoaderService, pathScene)
-        {
-            SceneData = SceneManager.GetSceneByPath(PathScene);
-        }
+        public LoadSceneCommand(ISceneLoaderService sceneLoaderService, string pathScene, LoadSceneRelationship loadSceneRelationship = LoadSceneRelationship.None) : base(
+            sceneLoaderService, pathScene, loadSceneRelationship) { }
 
         public override void Load()
         {
-            SceneLoaderService.LoadSceneAsync(PathScene, OnUpdateProgressLoad, OnCompleteLoad);
+            SceneLoaderService.LoadSceneAsync(PathScene, OnUpdateProgressLoad, OnCompleteLoad, LoadSceneRelationship);
             
             void OnCompleteLoad() => OnComplete?.Invoke();
             void OnUpdateProgressLoad(float value) => OnUpdateProgress?.Invoke(value);
@@ -30,7 +24,7 @@ namespace LittleBit.Modules.SceneLoader
 
         public override void Unload(Action onComplete)
         {
-            SceneLoaderService.UnloadScene(PathScene, null, onComplete);
+            SceneLoaderService.UnloadSceneAsync(PathScene, null, onComplete);
 
         }
 

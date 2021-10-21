@@ -3,11 +3,12 @@ using System.Collections;
 using LittleBit.Modules.CoreModule;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Zenject;
 
 namespace LittleBit.Modules.SceneLoader
 {
 
-    public class SceneLoaderService : IService
+    public class SceneLoaderService : ISceneLoaderService
     {
         private ICoroutineRunner _coroutineRunner;
 
@@ -15,13 +16,14 @@ namespace LittleBit.Modules.SceneLoader
         {
             _coroutineRunner = coroutineRunner;
         }
-
-        public void LoadSceneAsync(string pathScene, Action<float> onProgressUpdate, Action onComplete)
+        
+        public void LoadSceneAsync(string pathScene, Action<float> onProgressUpdate, Action onComplete,
+            LoadSceneRelationship loadSceneRelationship = LoadSceneRelationship.None)
         {
             _coroutineRunner.StartCoroutine(LoadingSceneAsync(pathScene, onProgressUpdate, onComplete));
         }
 
-        public void UnloadScene(string pathScene, Action<float> onProgressUpdate, Action onComplete)
+        public void UnloadSceneAsync(string pathScene, Action<float> onProgressUpdate, Action onComplete)
         {
             _coroutineRunner.StartCoroutine(UnloadSceneAsync(pathScene, onComplete));
         }

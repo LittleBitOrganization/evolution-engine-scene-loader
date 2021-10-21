@@ -1,23 +1,26 @@
 ﻿using System;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Zenject;
 
 namespace LittleBit.Modules.SceneLoader
 {
     public abstract class SceneLoaderCommand
     {
-        protected SceneLoaderService SceneLoaderService;
+        protected ISceneLoaderService SceneLoaderService;
         protected string PathScene;
+        protected LoadSceneRelationship LoadSceneRelationship = LoadSceneRelationship.None;
 
         protected Scene SceneData;
         public Scene Data => SceneData;
 
         protected GameObject RootGameObject;
 
-        protected SceneLoaderCommand(SceneLoaderService sceneLoaderService, string pathScene)
+        protected SceneLoaderCommand(ISceneLoaderService sceneLoaderService, string pathScene, LoadSceneRelationship loadSceneRelationship = LoadSceneRelationship.None)
         {
             SceneLoaderService = sceneLoaderService;
             PathScene = pathScene;
+            SceneData = SceneManager.GetSceneByPath(PathScene);
         }
 
         public abstract void Load();
