@@ -23,9 +23,9 @@ namespace LittleBit.Modules.SceneLoader
             _coroutineRunner.StartCoroutine(LoadingSceneAsync(pathScene, onProgressUpdate, onComplete));
         }
 
-        public void UnloadSceneAsync(string pathScene, Action<float> onProgressUpdate, Action onComplete)
+        public void UnloadSceneAsync(Scene scene, Action<float> onProgressUpdate, Action onComplete)
         {
-            _coroutineRunner.StartCoroutine(UnloadSceneAsync(pathScene, onComplete));
+            _coroutineRunner.StartCoroutine(UnloadSceneAsync(scene, onComplete));
         }
 
         private IEnumerator LoadingSceneAsync(string scene, Action<float> onProgressUpdate, Action onComplete)
@@ -40,7 +40,7 @@ namespace LittleBit.Modules.SceneLoader
             onComplete?.Invoke();
         }
 
-        private IEnumerator UnloadSceneAsync(string scene, Action onComplete)
+        private IEnumerator UnloadSceneAsync(Scene scene, Action onComplete)
         {
             AsyncOperation asyncUnload = SceneManager.UnloadSceneAsync(scene);
             while (!asyncUnload.isDone)

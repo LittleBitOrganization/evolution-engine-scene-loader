@@ -4,6 +4,8 @@ using LittleBit.Modules.CoreModule;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Zenject;
+using Object = UnityEngine.Object;
+
 
 namespace LittleBit.Modules.SceneLoader
 {
@@ -22,12 +24,15 @@ namespace LittleBit.Modules.SceneLoader
         {
             _coroutineRunner.StartCoroutine(LoadingSceneAsync(pathScene, onProgressUpdate, onComplete));
         }
-        
 
-        public void UnloadSceneAsync(string pathScene, Action<float> onProgressUpdate, Action onComplete)
+        public void UnloadSceneAsync(Scene scene, Action<float> onProgressUpdate, Action onComplete)
         {
-            throw new NotImplementedException();
+            foreach (var rootGameObject in scene.GetRootGameObjects())
+            {
+                Object.Destroy(rootGameObject);
+            }
         }
+
         
         private IEnumerator LoadingSceneAsync(string scene, Action<float> onProgressUpdate, Action onComplete, LoadSceneRelationship loadSceneRelationship = LoadSceneRelationship.None)
         {
@@ -40,5 +45,7 @@ namespace LittleBit.Modules.SceneLoader
 
             onComplete?.Invoke();
         }
+
+      
     }
 }
