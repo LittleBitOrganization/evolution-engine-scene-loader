@@ -14,6 +14,8 @@ namespace LittleBit.Modules.SceneLoader
         private readonly ZenjectSceneLoader _zenjectSceneLoader;
         private readonly ICoroutineRunner _coroutineRunner;
         
+        public event Action<Scene> OnLoadScene;
+
         public ZenjectSceneLoaderService(ZenjectSceneLoader zenjectSceneLoader, ICoroutineRunner coroutineRunner)
         {
             _zenjectSceneLoader = zenjectSceneLoader;
@@ -33,7 +35,6 @@ namespace LittleBit.Modules.SceneLoader
             }
         }
 
-        
         private IEnumerator LoadingSceneAsync(string scene, Action<float> onProgressUpdate, Action onComplete, LoadSceneRelationship loadSceneRelationship = LoadSceneRelationship.None)
         {
             AsyncOperation asyncOperation =_zenjectSceneLoader.LoadSceneAsync(scene, LoadSceneMode.Additive, null, loadSceneRelationship);
@@ -43,6 +44,7 @@ namespace LittleBit.Modules.SceneLoader
                 yield return null;
             }
 
+            OnLoadScene?.Invoke(SceneManager.GetSceneAt(SceneManager.sceneCount - 1));
             onComplete?.Invoke();
         }
 

@@ -12,6 +12,9 @@ namespace LittleBit.Modules.SceneLoader
     {
         private ICoroutineRunner _coroutineRunner;
 
+        public event Action<Scene> OnLoadScene;
+        public event Action<Scene> OnUnloadScene;
+        
         public SceneLoaderService(ICoroutineRunner coroutineRunner)
         {
             _coroutineRunner = coroutineRunner;
@@ -37,6 +40,7 @@ namespace LittleBit.Modules.SceneLoader
                 yield return null;
             }
 
+            OnLoadScene?.Invoke(SceneManager.GetSceneAt(SceneManager.sceneCount - 1));
             onComplete?.Invoke();
         }
 
