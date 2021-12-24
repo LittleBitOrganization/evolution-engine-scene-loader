@@ -3,9 +3,9 @@ using System.Collections;
 using LittleBit.Modules.CoreModule;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Scripting;
 using Zenject;
 using Object = UnityEngine.Object;
-
 
 namespace LittleBit.Modules.SceneLoader
 {
@@ -15,7 +15,8 @@ namespace LittleBit.Modules.SceneLoader
         private readonly ICoroutineRunner _coroutineRunner;
         
         public event Action<Scene> OnLoadScene;
-
+        
+        [Preserve]
         public ZenjectSceneLoaderService(ZenjectSceneLoader zenjectSceneLoader, ICoroutineRunner coroutineRunner)
         {
             _zenjectSceneLoader = zenjectSceneLoader;

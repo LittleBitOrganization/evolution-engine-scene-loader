@@ -3,6 +3,7 @@ using System.Collections;
 using LittleBit.Modules.CoreModule;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.Scripting;
 using Zenject;
 
 namespace LittleBit.Modules.SceneLoader
@@ -15,6 +16,7 @@ namespace LittleBit.Modules.SceneLoader
         public event Action<Scene> OnLoadScene;
         public event Action<Scene> OnUnloadScene;
         
+        [Preserve]
         public SceneLoaderService(ICoroutineRunner coroutineRunner)
         {
             _coroutineRunner = coroutineRunner;

@@ -1,6 +1,4 @@
 ﻿using System;
-using UnityEngine;
-using UnityEngine.SceneManagement;
 using Zenject;
 
 namespace LittleBit.Modules.SceneLoader
@@ -11,7 +9,6 @@ namespace LittleBit.Modules.SceneLoader
         protected string PathScene;
         protected LoadSceneRelationship LoadSceneRelationship = LoadSceneRelationship.None;
         
-
         protected SceneLoaderCommand(ISceneLoaderService sceneLoaderService, string pathScene, LoadSceneRelationship loadSceneRelationship = LoadSceneRelationship.None)
         {
             SceneLoaderService = sceneLoaderService;
