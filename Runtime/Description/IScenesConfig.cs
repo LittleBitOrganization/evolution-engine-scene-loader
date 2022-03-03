@@ -7,5 +7,6 @@ namespace LittleBit.Modules.SceneLoader.Description
         public SceneDescription LoadingScreenScene { get; }
         public IReadOnlyList<SceneDescription> QueueScenes { get; }
         public float MinLogoDuration { get; }
+        public SceneDescription ActiveScene { get; }
     }
 }
