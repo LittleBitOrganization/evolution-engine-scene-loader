@@ -1,0 +1,19 @@
+{
+    "name": "LittleBitGames.SceneLoaderModule.Editor",
+    "rootNamespace": "",
+    "references": [
+        "GUID:2e9f3389ae7aafc4d844ae96d768933c",
+        "GUID:607e5fc428cee124e9280c8cd460767b"
+    ],
+    "includePlatforms": [
+        "Editor"
+    ],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
+}
