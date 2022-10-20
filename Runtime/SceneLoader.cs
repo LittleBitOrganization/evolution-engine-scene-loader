@@ -10,7 +10,7 @@ using Zenject;
 
 namespace LittleBit.Modules.SceneLoader
 {
-    public class SceneLoader : IService
+    public class SceneLoader : SceneLoaderBase, IService
     {
         public static event Action OnAllScenesLoaded; //TODO: provide a better way for this
         public event Action<float, string> OnUpdate;
@@ -21,24 +21,10 @@ namespace LittleBit.Modules.SceneLoader
         private List<CommandWithSceneName> _commandLoadLoadingScreen;
         private List<CommandWithSceneName> _commandLoadAllScenes;
         
-        public class CommandWithSceneName
-        {
-            private LoadSceneCommand _loadSceneCommand;
-            private string _nameScene = "";
-
-            public CommandWithSceneName(LoadSceneCommand loadSceneCommand, string nameScene)
-            {
-                _loadSceneCommand = loadSceneCommand;
-                _nameScene = nameScene;
-            }
-
-            public LoadSceneCommand LoadSceneCommand => _loadSceneCommand;
-
-            public string NameScene => _nameScene;
-        }
+        
         
         public SceneLoader(ISceneLoaderService sceneLoaderService, ICoroutineRunner coroutineRunner,
-            IScenesConfig scenesConfig)
+            IScenesConfig scenesConfig) : base(sceneLoaderService)
         {
             _sceneLoaderService = sceneLoaderService;
             _scenesConfig = scenesConfig;
@@ -58,6 +44,7 @@ namespace LittleBit.Modules.SceneLoader
                 }
             };
         }
+        
         
         
         private void InitCommands()
@@ -136,21 +123,5 @@ namespace LittleBit.Modules.SceneLoader
             OnAllScenesLoaded?.Invoke();
         }
         
-        private List<CommandWithSceneName> CreateCommands(
-            LoadSceneRelationship loadSceneRelationship = LoadSceneRelationship.None,
-            params SceneDescription[] sceneDescriptions)
-        {
-            List<CommandWithSceneName> commands = new List<CommandWithSceneName>();
-            foreach (var scenesReference in sceneDescriptions)
-            {
-                var loadSceneCommand = new LoadSceneCommand(_sceneLoaderService, scenesReference.SceneReference,
-                    loadSceneRelationship);
-                var nameScene = scenesReference.NameScene;
-
-                commands.Add(new CommandWithSceneName(loadSceneCommand, nameScene));
-            }
-
-            return commands;
-        }
     }
 }
