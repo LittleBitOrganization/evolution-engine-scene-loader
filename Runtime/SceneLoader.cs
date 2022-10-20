@@ -42,13 +42,14 @@ namespace LittleBit.Modules.SceneLoader
         {
             _sceneLoaderService = sceneLoaderService;
             _scenesConfig = scenesConfig;
-
-            InitCommands();
-
             _coroutineRunner = coroutineRunner;
-
+        }
+        
+        public void LoadAllScenes() 
+        {
+            InitCommands();
             _coroutineRunner.StartCoroutine(LoadScenes());
-
+            
             _sceneLoaderService.OnLoadScene += scene =>
             {
                 if (scene.path == _scenesConfig.ActiveScene.SceneReference.ScenePath)
@@ -57,7 +58,8 @@ namespace LittleBit.Modules.SceneLoader
                 }
             };
         }
-
+        
+        
         private void InitCommands()
         {
             _commandLoadLoadingScreen = CreateCommands(LoadSceneRelationship.Child, _scenesConfig.LoadingScreenScene);
