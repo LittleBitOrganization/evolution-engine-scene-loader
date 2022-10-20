@@ -23,7 +23,7 @@ namespace LittleBit.Modules.SceneLoader
         
         public async Task LoadSceneAsync(CancellationToken token, SceneDescription scene)
         {
-            var asyncOperation = _zenjectSceneLoader.LoadSceneAsync(scene.NameScene, LoadSceneMode.Additive, containerMode: LoadSceneRelationship.Child);
+            var asyncOperation = _zenjectSceneLoader.LoadSceneAsync(scene.SceneReference.ScenePath, LoadSceneMode.Additive, containerMode: LoadSceneRelationship.Child);
             asyncOperation.allowSceneActivation = false;
     
             while (true)
