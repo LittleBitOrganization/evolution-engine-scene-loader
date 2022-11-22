@@ -51,5 +51,14 @@
 
 ![image](https://user-images.githubusercontent.com/66946236/203389917-7a959be0-24cd-47bd-9506-e2c7f50cfc60.png)
 
+## Использование
 
+- SceneLoader - полностью загружает все сцены последовательно через метод
+```ruby
+public void LoadAllScenes();
+```
+- SceneLoaderAsync - грузит асинхронно 1 или несколько сцен через метод 
+```ruby
+public async Task LoadSceneAsync(CancellationToken token, SceneDescription scene);
+```
 
