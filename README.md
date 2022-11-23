@@ -15,7 +15,7 @@
 
 ## Инициализация
 
-```
+```ruby
        Container.BindInterfacesAndSelfTo<CoroutineRunner>()
                 .FromNewComponentOnNewGameObject()
                 .AsSingle()
