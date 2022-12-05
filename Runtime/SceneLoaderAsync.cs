@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using LittleBit.Modules.CoreModule;
@@ -48,57 +49,56 @@ namespace LittleBit.Modules.SceneLoader
         // }
 
         
-        private IEnumerator RoutineLoadSceneAsync(SceneDescription scene, Action<float> onUpdateProgress, Action complete)
+        private IEnumerator RoutineLoadSceneAsync(SceneDescription scene, Action<float> onUpdateProgress)
         {
             var asyncOperation = _zenjectSceneLoader.LoadSceneAsync(scene.SceneReference.ScenePath, LoadSceneMode.Additive, containerMode: LoadSceneRelationship.Child);
             asyncOperation.allowSceneActivation = false;
             while (!asyncOperation.isDone)
             {
-                Debug.LogError("AsyncProgressScene " + scene.NameScene + ": " + asyncOperation.progress);
-                onUpdateProgress?.Invoke(asyncOperation.progress);
-
+                var progress = asyncOperation.progress / 0.9f;
+                
                 if (asyncOperation.progress >= 0.9f)
                 {
                     asyncOperation.allowSceneActivation = true;
                 }
 
                 yield return null;
-            }
-            complete?.Invoke();
-            
-        }
-
-        private async Task LoadSceneAsync(CancellationToken token, SceneDescription scene, Action<float> onUpdateProgress)
-        {
-            if (token.IsCancellationRequested) return;
-            bool isDone = false;
-
-            _coroutineRunner.StartCoroutine(RoutineLoadSceneAsync(scene, onUpdateProgress, () => isDone = true));
-            while (isDone == false)
-            {
-                await Task.Delay(50, token);
+                Debug.LogError("AsyncProgressScene " + scene.NameScene + ": " + progress);
+                onUpdateProgress?.Invoke(progress);
             }
         }
-        
-        public async Task LoadSceneAsync(CancellationToken token, Action<float> onUpdateProgress, params SceneDescription [] scenes)
+
+        private IEnumerator RoutineLoadScenesAsync(List<SceneDescription> scenes, Action<float> onUpdateProgress, Action complete)
         {
             Queue<SceneDescription> queue = new Queue<SceneDescription>(scenes);
-            
+
             float loadedScenes = 0;
             float GetProgress(float current, float max) => current / max;
             
             while (queue.Count > 0)
             {
-                if (token.IsCancellationRequested) return;
                 var scene = queue.Dequeue();
-                
-                await LoadSceneAsync(token, scene, (progress) =>
+                yield return RoutineLoadSceneAsync(scene, (progress) =>
                 {
                     float currentProgress = loadedScenes + progress;
-                    onUpdateProgress?.Invoke(GetProgress(currentProgress, scenes.Length));
+                    onUpdateProgress?.Invoke(GetProgress(currentProgress, scenes.Count));
                 });
                 loadedScenes++;
-                onUpdateProgress?.Invoke(GetProgress(loadedScenes, scenes.Length));
+            }
+            onUpdateProgress?.Invoke(GetProgress(loadedScenes, scenes.Count));
+            complete?.Invoke();
+        }
+
+
+        
+        public async Task LoadSceneAsync(CancellationToken token, Action<float> onUpdateProgress, params SceneDescription [] scenes)
+        {
+            bool isDone = false;
+            _coroutineRunner.StartCoroutine(RoutineLoadScenesAsync(scenes.ToList(), onUpdateProgress, () => isDone = true));
+          
+            while (isDone == false)
+            {
+                await Task.Delay(50, token);
             }
         }
         
