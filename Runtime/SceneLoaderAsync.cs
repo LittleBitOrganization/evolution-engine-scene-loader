@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
@@ -14,35 +15,70 @@ namespace LittleBit.Modules.SceneLoader
     {
 
         private readonly ZenjectSceneLoader _zenjectSceneLoader;
+        private readonly ICoroutineRunner _coroutineRunner;
 
         public SceneLoaderAsync(ISceneLoaderService sceneLoaderService,
-            ZenjectSceneLoader zenjectSceneLoader) : base(sceneLoaderService)
+            ZenjectSceneLoader zenjectSceneLoader, ICoroutineRunner coroutineRunner) : base(sceneLoaderService)
         {
-
             _zenjectSceneLoader = zenjectSceneLoader;
+            _coroutineRunner = coroutineRunner;
         }
         
         
-        public async Task LoadSceneAsync(CancellationToken token, Action<float> onUpdateProgress, SceneDescription scene)
+      
+
+        // public async Task RoutineLoadSceneAsync(Action<float> onUpdateProgress, SceneDescription scene)
+        // {
+        //     var asyncOperation = _zenjectSceneLoader.RoutineLoadSceneAsync(scene.SceneReference.ScenePath, LoadSceneMode.Additive, containerMode: LoadSceneRelationship.Child);
+        //     asyncOperation.allowSceneActivation = false;
+        //     
+        //     while (!asyncOperation.isDone){
+        //     
+        //         Debug.LogError("AsyncProgressScene " + scene.NameScene + ": " + asyncOperation.progress);
+        //         onUpdateProgress?.Invoke(asyncOperation.progress);
+        //         
+        //         if (token.IsCancellationRequested) return;
+        //         
+        //         if (asyncOperation.progress >= 0.9f)
+        //         {
+        //             asyncOperation.allowSceneActivation = true;
+        //         }
+        //         await Task.Delay(50, token);
+        //     }
+        // }
+
+        
+        private IEnumerator RoutineLoadSceneAsync(SceneDescription scene, Action<float> onUpdateProgress, Action complete)
         {
             var asyncOperation = _zenjectSceneLoader.LoadSceneAsync(scene.SceneReference.ScenePath, LoadSceneMode.Additive, containerMode: LoadSceneRelationship.Child);
             asyncOperation.allowSceneActivation = false;
-            
-            while (!asyncOperation.isDone){
-            
+            while (!asyncOperation.isDone)
+            {
                 Debug.LogError("AsyncProgressScene " + scene.NameScene + ": " + asyncOperation.progress);
                 onUpdateProgress?.Invoke(asyncOperation.progress);
-                
-                if (token.IsCancellationRequested) return;
-                
+
                 if (asyncOperation.progress >= 0.9f)
                 {
                     asyncOperation.allowSceneActivation = true;
                 }
+
+                yield return null;
+            }
+            complete?.Invoke();
+            
+        }
+
+        private async void LoadSceneAsync(CancellationToken token, SceneDescription scene, Action<float> onUpdateProgress)
+        {
+            if (token.IsCancellationRequested) return;
+            bool isDone = false;
+
+            _coroutineRunner.StartCoroutine(RoutineLoadSceneAsync(scene, onUpdateProgress, () => isDone = true));
+            while (isDone == false)
+            {
                 await Task.Delay(50, token);
             }
         }
-
         
         public async Task LoadSceneAsync(CancellationToken token, Action<float> onUpdateProgress, params SceneDescription [] scenes)
         {
@@ -54,6 +90,8 @@ namespace LittleBit.Modules.SceneLoader
             while (queue.Count > 0)
             {
                 var scene = queue.Dequeue();
+                
+                
                 await LoadSceneAsync(token, (progress) =>
                 {
                     float currentProgress = loadedScenes + progress;
