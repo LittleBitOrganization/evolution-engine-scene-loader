@@ -26,48 +26,27 @@ namespace LittleBit.Modules.SceneLoader
         }
         
         
-      
-
-        // public async Task RoutineLoadSceneAsync(Action<float> onUpdateProgress, SceneDescription scene)
-        // {
-        //     var asyncOperation = _zenjectSceneLoader.RoutineLoadSceneAsync(scene.SceneReference.ScenePath, LoadSceneMode.Additive, containerMode: LoadSceneRelationship.Child);
-        //     asyncOperation.allowSceneActivation = false;
-        //     
-        //     while (!asyncOperation.isDone){
-        //     
-        //         Debug.LogError("AsyncProgressScene " + scene.NameScene + ": " + asyncOperation.progress);
-        //         onUpdateProgress?.Invoke(asyncOperation.progress);
-        //         
-        //         if (token.IsCancellationRequested) return;
-        //         
-        //         if (asyncOperation.progress >= 0.9f)
-        //         {
-        //             asyncOperation.allowSceneActivation = true;
-        //         }
-        //         await Task.Delay(50, token);
-        //     }
-        // }
-
-        
         private IEnumerator RoutineLoadSceneAsync(SceneDescription scene, Action<float> onUpdateProgress)
         {
-            var asyncOperation = _zenjectSceneLoader.LoadSceneAsync(scene.SceneReference.ScenePath, LoadSceneMode.Additive, containerMode: LoadSceneRelationship.Child);
+            var asyncOperation = _zenjectSceneLoader.LoadSceneAsync(scene.SceneReference.ScenePath, LoadSceneMode.Additive, null, containerMode: LoadSceneRelationship.Child);
+            float progress = 0;
             asyncOperation.allowSceneActivation = false;
+    
             while (!asyncOperation.isDone)
             {
-                var progress = asyncOperation.progress / 0.9f;
+                progress += Time.deltaTime;
+                progress = Mathf.Min(progress, 1);
+                onUpdateProgress?.Invoke(progress);
                 
                 if (asyncOperation.progress >= 0.9f)
                 {
                     asyncOperation.allowSceneActivation = true;
                 }
-
                 yield return null;
-                Debug.LogError("AsyncProgressScene " + scene.NameScene + ": " + progress);
-                onUpdateProgress?.Invoke(progress);
             }
+            onUpdateProgress?.Invoke(1);
         }
-
+        
         private IEnumerator RoutineLoadScenesAsync(List<SceneDescription> scenes, Action<float> onUpdateProgress, Action complete)
         {
             Queue<SceneDescription> queue = new Queue<SceneDescription>(scenes);
