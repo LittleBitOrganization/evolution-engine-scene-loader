@@ -28,16 +28,14 @@ namespace LittleBit.Modules.SceneLoader
             var asyncOperation = _zenjectSceneLoader.LoadSceneAsync(scene.SceneReference.ScenePath, LoadSceneMode.Additive, containerMode: LoadSceneRelationship.Child);
             asyncOperation.allowSceneActivation = false;
     
-            while (true)
+            while (asyncOperation.progress < 0.9f)
             {
+                onUpdateProgress?.Invoke(asyncOperation.progress);
+                
                 if (token.IsCancellationRequested) return;
-
-                if (asyncOperation.progress >= 0.9f)
-                    break;
-                else
-                    onUpdateProgress?.Invoke(asyncOperation.progress);
                 
                 await Task.Delay(50, token);
+                
             }
             asyncOperation.allowSceneActivation = true;
         }
