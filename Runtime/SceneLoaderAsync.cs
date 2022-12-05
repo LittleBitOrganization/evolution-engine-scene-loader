@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using LittleBit.Modules.CoreModule;
@@ -22,7 +23,7 @@ namespace LittleBit.Modules.SceneLoader
         }
         
         
-        public async Task LoadSceneAsync(CancellationToken token, SceneDescription scene)
+        public async Task LoadSceneAsync(CancellationToken token, Action<float> onUpdateProgress, SceneDescription scene)
         {
             var asyncOperation = _zenjectSceneLoader.LoadSceneAsync(scene.SceneReference.ScenePath, LoadSceneMode.Additive, containerMode: LoadSceneRelationship.Child);
             asyncOperation.allowSceneActivation = false;
@@ -30,20 +31,35 @@ namespace LittleBit.Modules.SceneLoader
             while (true)
             {
                 if (token.IsCancellationRequested) return;
-                if (asyncOperation.progress >= 0.9f) break;
+
+                if (asyncOperation.progress >= 0.9f)
+                    break;
+                else
+                    onUpdateProgress?.Invoke(asyncOperation.progress);
+                
                 await Task.Delay(50, token);
             }
             asyncOperation.allowSceneActivation = true;
         }
 
         
-        public async Task LoadSceneAsync(CancellationToken token, params SceneDescription [] scenes)
+        public async Task LoadSceneAsync(CancellationToken token, Action<float> onUpdateProgress, params SceneDescription [] scenes)
         {
             Queue<SceneDescription> queue = new Queue<SceneDescription>(scenes);
+            
+            float loadedScenes = 0;
+            float GetProgress(float current, float max) => current / max;
+            
             while (queue.Count > 0)
             {
                 var scene = queue.Dequeue();
-                await LoadSceneAsync(token, scene);
+                await LoadSceneAsync(token, (progress) =>
+                {
+                    float currentProgress = loadedScenes + progress;
+                    onUpdateProgress?.Invoke(GetProgress(currentProgress, scenes.Length));
+                },scene);
+                loadedScenes++;
+                onUpdateProgress?.Invoke(GetProgress(loadedScenes, scenes.Length));
             }
         }
         
