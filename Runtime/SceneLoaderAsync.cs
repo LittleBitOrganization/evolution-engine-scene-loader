@@ -27,17 +27,20 @@ namespace LittleBit.Modules.SceneLoader
         {
             var asyncOperation = _zenjectSceneLoader.LoadSceneAsync(scene.SceneReference.ScenePath, LoadSceneMode.Additive, containerMode: LoadSceneRelationship.Child);
             asyncOperation.allowSceneActivation = false;
-    
-            while (asyncOperation.progress < 0.9f)
-            {
+            
+            while (!asyncOperation.isDone){
+            
+                Debug.LogError("AsyncProgressScene " + scene.NameScene + ": " + asyncOperation.progress);
                 onUpdateProgress?.Invoke(asyncOperation.progress);
                 
                 if (token.IsCancellationRequested) return;
                 
+                if (asyncOperation.progress >= 0.9f)
+                {
+                    asyncOperation.allowSceneActivation = true;
+                }
                 await Task.Delay(50, token);
-                
             }
-            asyncOperation.allowSceneActivation = true;
         }
 
         
