@@ -68,7 +68,7 @@ namespace LittleBit.Modules.SceneLoader
             
         }
 
-        private async void LoadSceneAsync(CancellationToken token, SceneDescription scene, Action<float> onUpdateProgress)
+        private async Task LoadSceneAsync(CancellationToken token, SceneDescription scene, Action<float> onUpdateProgress)
         {
             if (token.IsCancellationRequested) return;
             bool isDone = false;
@@ -89,14 +89,14 @@ namespace LittleBit.Modules.SceneLoader
             
             while (queue.Count > 0)
             {
+                if (token.IsCancellationRequested) return;
                 var scene = queue.Dequeue();
                 
-                
-                await LoadSceneAsync(token, (progress) =>
+                await LoadSceneAsync(token, scene, (progress) =>
                 {
                     float currentProgress = loadedScenes + progress;
                     onUpdateProgress?.Invoke(GetProgress(currentProgress, scenes.Length));
-                },scene);
+                });
                 loadedScenes++;
                 onUpdateProgress?.Invoke(GetProgress(loadedScenes, scenes.Length));
             }
