@@ -26,7 +26,7 @@ namespace LittleBit.Modules.SceneLoader
         }
         
         
-        private IEnumerator RoutineLoadSceneAsync(SceneDescription scene, Action<float> onUpdateProgress)
+        private IEnumerator RoutineLoadSceneAsync(SceneDescription scene, Action<float> onUpdateProgress, Action onComplete)
         {
             var asyncOperation = _zenjectSceneLoader.LoadSceneAsync(scene.SceneReference.ScenePath, LoadSceneMode.Additive, null, containerMode: LoadSceneRelationship.Child);
             float progress = 0;
@@ -45,6 +45,7 @@ namespace LittleBit.Modules.SceneLoader
                 yield return null;
             }
             onUpdateProgress?.Invoke(1);
+            onComplete?.Invoke();
         }
         
         private IEnumerator RoutineLoadScenesAsync(List<SceneDescription> scenes, Action<float> onUpdateProgress, Action complete)
@@ -61,7 +62,7 @@ namespace LittleBit.Modules.SceneLoader
                 {
                     float currentProgress = loadedScenes + progress;
                     onUpdateProgress?.Invoke(GetProgress(currentProgress, scenes.Count));
-                });
+                }, null);
                 loadedScenes++;
             }
             onUpdateProgress?.Invoke(GetProgress(loadedScenes, scenes.Count));
@@ -69,8 +70,17 @@ namespace LittleBit.Modules.SceneLoader
         }
 
 
+        public async Task LoadSceneAsync(CancellationToken token, Action<float> onUpdateProgress, SceneDescription scene)
+        {
+            bool isDone = false;
+            _coroutineRunner.StartCoroutine(RoutineLoadSceneAsync(scene, onUpdateProgress, () => isDone = true));
+            while (isDone == false)
+            {
+                await Task.Delay(50, token);
+            }
+        }
         
-        public async Task LoadSceneAsync(CancellationToken token, Action<float> onUpdateProgress, params SceneDescription [] scenes)
+        public async Task LoadSceneAsync(CancellationToken token, Action<float> onUpdateProgress, SceneDescription [] scenes)
         {
             bool isDone = false;
             _coroutineRunner.StartCoroutine(RoutineLoadScenesAsync(scenes.ToList(), onUpdateProgress, () => isDone = true));
